@@ -24,7 +24,11 @@ class Database(BaseModel):
     for connecting to the database.
     """
 
-    url: str = "database.db"
+    name: str = "database.db"  # change by env for test
+
+    @property
+    def url(self):
+        return str(ROOT_DIR / self.name)
 
 
 class Settings(BaseSettings):
@@ -39,4 +43,4 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()  # noqa
+settings = Settings()
