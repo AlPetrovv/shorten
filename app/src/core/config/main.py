@@ -5,7 +5,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).parent.parent.parent.parent  # src
 ROOT_DIR = BASE_DIR.parent  # app
-ENV_FILE_DEV = ROOT_DIR.parent / 'envs/dev/local/app.env'
+ENV_FILE_DEV = ROOT_DIR / 'envs/dev/app.env'
+
+
+class ApiV1(BaseModel):
+    prefix: str = "/v1"
+
+
+class Api(BaseModel):
+    v1: ApiV1 = ApiV1()
 
 
 class Database(BaseModel):
@@ -16,11 +24,12 @@ class Database(BaseModel):
     for connecting to the database.
     """
 
-    url: str
+    url: str = "database.db"
 
 
 class Settings(BaseSettings):
-    db: Database = Field(description="DBSettings")
+    api: Api = Api()
+    db: Database = Database()
     model_config = SettingsConfigDict(
         env_file=ENV_FILE_DEV,
         extra="allow",
