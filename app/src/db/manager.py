@@ -1,6 +1,6 @@
 import contextlib
 import logging
-from typing import AsyncIterator
+from typing import AsyncGenerator
 
 import aiosqlite
 from aiosqlite import Connection
@@ -38,11 +38,15 @@ class DatabaseManager:
 
             await conn.commit()
 
+    async def drop_tables(self):
+        async with connect(self._db_url) as conn:
+            await conn.execute("DROP TABLE IF EXISTS link")
+
     @contextlib.asynccontextmanager
-    async def db(self) -> AsyncIterator[Connection]:
+    async def db(self) -> AsyncGenerator[Connection]:
         conn = await connect(self._db_url)
+        conn.row_factory = aiosqlite.Row
         try:
-            conn.row_factory = aiosqlite.Row
             yield conn
             await conn.commit()
         except Exception as e:
