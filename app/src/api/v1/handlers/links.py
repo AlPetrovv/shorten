@@ -58,6 +58,16 @@ async def shorten(db: DBDep, link_in: LinkIn, response: Response):
     return LinkResponse(code=code, source_url=source_url)
 
 
-@router.get("/{code}", response_model=None, status_code=status.HTTP_301_MOVED_PERMANENTLY)
+@router.get(
+    "/{code}",
+    summary="Redirect to the original link",
+    response_model=None,
+    status_code=status.HTTP_301_MOVED_PERMANENTLY,
+)
+async def redirect_to_link(link: Row = Depends(get_short_link)) -> RedirectResponse:
+    return RedirectResponse(link["source_url"], status_code=status.HTTP_301_MOVED_PERMANENTLY)
+
+
+@router.get("/{code}", summary="", response_model=None, status_code=status.HTTP_301_MOVED_PERMANENTLY)
 async def redirect_to_link(link: Row = Depends(get_short_link)) -> RedirectResponse:
     return RedirectResponse(link["source_url"], status_code=status.HTTP_301_MOVED_PERMANENTLY)

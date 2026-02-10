@@ -12,6 +12,18 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseManager:
+    """
+    Manages the database connection and provides methods for creating and dropping tables.
+
+    Attributes:
+        _db_url (str): The URL of the database.
+
+    Methods:
+        __init__(db_url: str): Initializes the DatabaseManager instance.
+        create_tables() -> AsyncGenerator[None, aiosqlite.Connection]: Creates the link table.
+        drop_tables() -> AsyncGenerator[None, aiosqlite.Connection]: Drops the link table.
+        db() -> AsyncGenerator[aiosqlite.Connection, None]: Returns a connection to the database.
+    """
 
     def __init__(self, db_url: str):
         self._db_url = db_url
