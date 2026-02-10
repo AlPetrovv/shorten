@@ -2,7 +2,8 @@ import contextlib
 import logging
 from typing import AsyncIterator
 
-from aiosqlite import Cursor
+import aiosqlite
+from aiosqlite import Connection
 from aiosqlite import connect
 
 from core.config import settings
@@ -15,21 +16,39 @@ class DatabaseManager:
     def __init__(self, db_url: str):
         self._db_url = db_url
 
+    async def create_tables(self):
+        async with connect(self._db_url) as conn:
+            await conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS link
+                (
+                    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                    source_url TEXT NOT NULL,
+                    code       TEXT NOT NULL UNIQUE CHECK (length(code) <= 8)
+                );
+                """
+            )
+
+            await conn.execute(
+                """
+                               CREATE INDEX IF NOT EXISTS idx_link_code
+                                   ON link(code);
+                               """
+            )
+
+            await conn.commit()
+
     @contextlib.asynccontextmanager
-    async def cursor(self) -> AsyncIterator[Cursor]:
+    async def db(self) -> AsyncIterator[Connection]:
         conn = await connect(self._db_url)
-        cursor = None
         try:
-            cursor = await conn.cursor()
-            yield cursor
+            conn.row_factory = aiosqlite.Row
+            yield conn
             await conn.commit()
         except Exception as e:
-            logger.error("DB Error", exc_info=e)
             await conn.rollback()
             raise
         finally:
-            if cursor is not None:
-                await cursor.close()
             await conn.close()
 
 
