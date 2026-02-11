@@ -12,16 +12,18 @@ async def test_create_short_link(api_client, mock_link_in):
 
 
 @pytest.mark.parametrize(
-    "source_link, status_code",
+    "source_link",
     [
-        ("https://www.youtube.com/", 201),
-        ("https://www.youtube.com/", 200),
+        "https://www.youtube.com/",
+        "https://www.facebook.com/",
     ],
 )
-async def test_create_status_code(api_client, mock_link_in, source_link, status_code):
+async def test_create_status_code(api_client, mock_link_in, source_link):
     link_in = mock_link_in({"source_link": source_link})
-    response = await api_client.post("/links/shorten", json=link_in.model_dump(mode="json"))
-    assert response.status_code == status_code
+    first_response = await api_client.post("/links/shorten", json=link_in.model_dump(mode="json"))
+    assert first_response.status_code == 201
+    second_response = await api_client.post("/links/shorten", json=link_in.model_dump(mode="json"))
+    assert second_response.status_code == 200
 
 
 @pytestmark
