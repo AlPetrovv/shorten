@@ -43,9 +43,9 @@ class DatabaseManager:
 
             await conn.execute(
                 """
-                               CREATE INDEX IF NOT EXISTS idx_link_code
-                                   ON link(code);
-                               """
+                CREATE INDEX IF NOT EXISTS idx_link_code
+                    ON link (code);
+                """
             )
 
             await conn.commit()
@@ -53,6 +53,7 @@ class DatabaseManager:
     async def drop_tables(self):
         async with connect(self._db_url) as conn:
             await conn.execute("DROP TABLE IF EXISTS link")
+            await conn.commit()
 
     @contextlib.asynccontextmanager
     async def db(self) -> AsyncGenerator[Connection]:
