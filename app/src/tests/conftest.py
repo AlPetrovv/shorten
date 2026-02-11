@@ -2,12 +2,12 @@ from typing import AsyncGenerator
 
 import pytest
 import pytest_asyncio
-from aiosqlite import Connection
+
 from httpx import AsyncClient, ASGITransport
 
 
 from db.manager import db_manager
-from db.utils import get_db
+
 from main import create_app
 
 from tests.links.fixtures import *  # noqa
